@@ -1,32 +1,7 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
+import contactService from './services/contacts'
 
-const Search = ({filter, handleFilterChange}) => {
-  return (
-    <>
-      find <input value={filter} onChange={handleFilterChange}/>
-    </>
-  )
-}
 
-const Contacts = ({filteredContacts}) => {
-  return(
-    <>
-      <h2>Numbers</h2>
-      {filteredContacts.map(person => {
-        return <ContactInfo key={person.name}  person={person}/>
-      })}
-    </>
-  )
-}
-
-const ContactInfo = ({person}) => {
-  return(
-    <>
-      <p key={person.id}>{person.name} - {person.number}</p>
-    </>
-  )
-}
 
 
 const App = () => {
@@ -37,8 +12,8 @@ const App = () => {
   const [filter, setFilter] = useState('')
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
+    contactService
+      .getAll()
       .then(response => {
         console.log('promise fulfilled')
         setPersons(response.data)
@@ -61,10 +36,22 @@ const addName = (e) =>{
       alert(`${newName} is already in the phone book`)
       setNewName('')
     }else{
-      setPersons(persons.concat(nameObj))
-  setNewName('')
-  setNewNumber('')
+      contactService
+        .create(nameObj)
+        .then(response => {
+          setPersons(persons.concat(nameObj))
+          setNewName('')
+          setNewNumber('')
+        })
+      
     }
+}
+
+const deleteInfo = (id) => {
+  
+  contactService
+    .deleteContact(id)
+  setPersons(persons.filter(person => person.id !== id))
 }
 
 const handleNameChange = (e) => {
@@ -88,22 +75,53 @@ const filteredContacts = persons.filter((person) => {
     <div>
       <h2>Phonebook</h2>
       <h4>-------------------------------------</h4>
-      <Search onChange={handleFilterChange} filter={filter}/>
+      <Search handleFilterChange={handleFilterChange} filter={filter}/>
       <h4>-------------------------------------</h4>
       <form>
         <div>
           name: <input value={newName} onChange={handleNameChange}/>
         </div>
         <div>
-          number: <input value={newNumber} onChange={handleNumberChange}/>
+          number: <input value={newNumber} onChange={handleNumberChange} />
         </div>
         <div>
           <button type="submit" onClick={addName}>add</button>
         </div>
       </form>
-     <Contacts filteredContacts={filteredContacts}/>
+     <Contacts filteredContacts={filteredContacts} deleteInfo={deleteInfo}/>
       
     </div>
+  )
+}
+
+
+
+
+
+const Search = ({filter, handleFilterChange}) => {
+  return (
+    <>
+      find <input value={filter} onChange={handleFilterChange}/>
+    </>
+  )
+}
+
+const Contacts = ({filteredContacts, deleteInfo}) => {
+  return(
+    <>
+      <h2>Numbers</h2>
+      {filteredContacts.map(person => {
+        return <ContactInfo key={person.name} deleteInfo={deleteInfo} person={person}/>
+      })}
+    </>
+  )
+}
+
+const ContactInfo = ({person, deleteInfo}) => {
+  return(
+    <>
+      <p key={person.id}>{person.name} - {person.number}<button onClick={() => deleteInfo(person.id)}>delete</button></p>
+    </>
   )
 }
 
