@@ -1,0 +1,10 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+
+{
+ "title": "Revisiting Algorithms with Khan Academy",
+ "author": "Amber Wilkie",
+ "url": "https://medium.com/@heyamberwilkie/revisiting-algorithms-with-khan-academy-205f8ecd8fcb",
+ "likes": 5
+}

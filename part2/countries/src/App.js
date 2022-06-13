@@ -9,7 +9,7 @@ function App() {
 
   const [countries, setCountries] = useState([]);
   const [filter, setFilter] = useState('')
-  const [showInfo, setShowInfo] = useState(false)
+  
   const handleFilterChange = (e) => {
     setFilter(e.target.value);
   }
@@ -22,6 +22,7 @@ function App() {
       .get('https://restcountries.com/v3.1/all')
       .then(response => setCountries(response.data))
   }, [])
+  console.log(countries)
   return (
     <div className="App">
     <Search filter={filter} handleFilterChange={handleFilterChange}/>
@@ -29,18 +30,18 @@ function App() {
         return <CountryInfo country={country} key={country.name.common} />
       }) : filterCountries.length < 10 ? 
         filterCountries.map(country => {
-        return <CountryName key={country.name.common} country={country} />
+        return <CountryName key={country.name.common} country={country} setFilter={setFilter} />
       }) : <TooManyMatches/>}
     </div>
   );
 }
 
-const CountryName = ({country, setShowInfo}) => {
+const CountryName = ({country, setFilter}) => {
 
   return(
     <>
       <p>{country.name.common}</p>
-      <button onClick={() => setShowInfo(true)}>showInfo</button>
+      <button onClick={() => setFilter(country.name.common.toLocaleLowerCase())}>showInfo</button>
     </>
   )
 }
